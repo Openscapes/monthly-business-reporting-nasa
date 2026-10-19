@@ -1,0 +1,164 @@
+---
+title: "NASA Openscapes monthly report slide"
+format:
+  html:
+    embed-resources: true
+    toc: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(patchwork)
+library(purrr)
+library(rlang)
+library(xml2)
+library(officer)
+library(jupycost)
+
+gdrive_email <- "andy@openscapes.org"
+
+deck_drive_id <- "1GIo__VRaCx4aG-04lwcD93UFHr1k3N4z"
+download_deck <- TRUE
+template <- "template/NASA-Openscapes_PMR_Slides.pptx"
+output <- "output/NASA-Openscapes_PMR_Slides.pptx"
+start <- ""
+end <- ""
+cluster <- "openscapeshub"
+
+for (f in list.files("R", pattern = "\\.R$", full.names = TRUE)) {
+  source(f)
+}
+
+googledrive::drive_auth(email = gdrive_email)
+googlesheets4::gs4_auth(email = gdrive_email)
+
+if (isTRUE(download_deck)) {
+  dir.create(dirname(template), showWarnings = FALSE)
+  googledrive::drive_download(
+    googledrive::as_id(deck_drive_id),
+    path = template,
+    overwrite = TRUE
+  )
+}
+dir.create(dirname(output), showWarnings = FALSE)
+
+deck <- read_pptx(template)
+range <- previous_report_range(deck)
+start <- if (nzchar(start)) as.Date(start) else range$start
+end <- if (nzchar(end)) as.Date(end) else range$end
+```
+
+Report period: **`r format_range(start, end)`** (the previous slide ended `r format_day(range$prev_end, "%b %d %Y")`).
+
+## Monthly AWS usage
+
+```{r aws}
+costs <- get_report_costs(start, end, cluster = cluster)
+usage_plot <- plot_report_costs(costs, start, end)
+chart_path <- file.path(dirname(output), "aws-usage.png")
+save_usage_plot(usage_plot, chart_path, chart_location(presented_slide(deck)))
+
+caption <- caption_runs(
+  attr(usage_plot, "color_key"),
+  "https://openscapes.cloud/usage-reporting#monthly-nasa-reports"
+)
+
+credits_text <- get_credits_text()
+```
+
+![](`r chart_path`){width=70%}
+
+## Engineering issues
+
+```{r engineering}
+eng <- get_engineering_issues(start, end)
+eng |>
+  transmute(
+    repo,
+    issue = paste0("[#", number, "](", url, ")"),
+    activity,
+    title
+  ) |>
+  knitr::kable()
+```
+
+## Events
+
+```{r events}
+events <- get_workshop_events(start, end)
+planning <- get_planning_activity(start, end, exclude = events$number)
+
+events |>
+  transmute(
+    issue = paste0("[#", number, "](", url, ")"),
+    event,
+    event_start,
+    event_end,
+    participants
+  ) |>
+  knitr::kable(caption = "Workshops with a start date in the report period")
+
+planning |>
+  transmute(issue = paste0("[#", number, "](", url, ")"), activity, title) |>
+  knitr::kable(
+    caption = "Other workshop-planning issues active in the report period"
+  )
+```
+
+## Mentor calls
+
+```{r mentor-calls}
+calls <- get_mentor_calls(start, end)
+calls |>
+  transmute(
+    date = format_day(date),
+    type = if_else(is_mentor_call, "Mentor call", "Other meeting"),
+    summary = map2_chr(summary, title, \(s, t) {
+      if (nrow(s)) paste(s$text[s$level == 1], collapse = "<br>") else t
+    })
+  ) |>
+  knitr::kable(escape = FALSE)
+```
+
+## Slide
+
+```{r build}
+paragraphs <- slide_paragraphs(eng, events, calls, planning)
+build_report_deck(
+  deck,
+  output,
+  start,
+  end,
+  paragraphs,
+  chart_path,
+  caption,
+  credits_text
+)
+
+thumb_dir <- file.path(dirname(output), "thumbnail")
+if (nzchar(Sys.which("qlmanage"))) {
+  dir.create(thumb_dir, showWarnings = FALSE)
+  system2(
+    "qlmanage",
+    c("-t", "-s", "1600", "-o", shQuote(thumb_dir), shQuote(output)),
+    stdout = FALSE,
+    stderr = FALSE
+  )
+}
+thumb <- file.path(thumb_dir, paste0(basename(output), ".png"))
+```
+
+New slide inserted at position 1 of `r output`. Items in red on the slide are placeholders to fill in by hand.
+
+```{r thumbnail}
+#| results: asis
+if (file.exists(thumb)) {
+  cat(sprintf("![](%s)", thumb))
+}
+```

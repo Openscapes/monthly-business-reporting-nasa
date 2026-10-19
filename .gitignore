@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+template/*.pptx
+output/
+report.html
+report_files/
+template/_inspect/
