@@ -1,6 +1,6 @@
 # monthly-reporting
 
-Generates the NASA Openscapes monthly reporting slide and inserts it as slide 1 of a local copy of `NASA-Openscapes_PMR_Slides.pptx`.
+Generates a draft of the NASA Openscapes monthly reporting slide and inserts it as slide 1 of a local copy of `NASA-Openscapes_PMR_Slides.pptx`.
 The slide copies the layout of the current first slide and is built with officer.
 
 ## Usage
@@ -17,21 +17,27 @@ This will:
 3. Pull the content, build the slide, and write `output/NASA-Openscapes_PMR_Slides.pptx`.
 4. Render `report.html`, a review page with the chart, the raw items pulled from each source, and a thumbnail of the new slide.
 
-Upload the output deck to Drive yourself.
-The original deck is never modified.
+Upload the output deck to Drive yourself and copy the slide into the original.
+You have to upload the whole deck as a pptx, if you copy the slide from the local copy and paste it into the original deck, it will only be copied as a single image.
 
 ## Settings
 
-Edit the plain R variables at the top of the `setup` chunk in `report.qmd`:
+Edit the R variables at the top of the `setup` chunk in `report.qmd`:
 
-  | Variable             | Purpose                                                           |
-  | -------------------- | ----------------------------------------------------------------- |
-  | `gdrive_email`       | Google account used for googledrive and googlesheets4             |
-  | `deck_drive_id`      | Drive id of the source deck                                       |
-  | `download_deck`      | Set to `FALSE` to reuse the existing local copy in `template/`    |
-  | `template`, `output` | Paths of the local source deck and the generated deck             |
-  | `start`, `end`       | Report range as `"YYYY-MM-DD"`; leave `""` to derive from slide 1 |
-  | `cluster`            | Hub name used for the cost query                                  |
+  | Variable             | Purpose                                                                                                                                                      |
+  | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+  | `gdrive_email`       | Google account used for googledrive and googlesheets4                                                                                                        |
+  | `deck_drive_id`      | Drive id of the source deck                                                                                                                                  |
+  | `download_deck`      | Set to `FALSE` to reuse the existing local copy in `template/`                                                                                               |
+  | `template`, `output` | Paths of the local source deck and the generated deck                                                                                                        |
+  | `start`, `end`       | Report range as `"YYYY-MM-DD"`; leave as `""` to derive `start` as the day after the most recent slide end date, and `end` as the third Monday of the month. |
+  | `cluster`            | Hub name used for the cost query                                                                                                                             |
+
+To authenticate with AWS and Grafana for hub usage reporting, the script expects the following environment variables to be set:
+
+- `"NASA_AWS_ACCESS_KEY_ID"`
+- `"NASA_AWS_SECRET_ACCESS_KEY"`
+- `"NASA_GRAFANA_TOKEN"`
 
 ## Slide content
 
@@ -44,10 +50,10 @@ Edit the plain R variables at the top of the `setup` chunk in `report.qmd`:
   | Events hosted & supported  | `workshop`-labelled issues in `NASA-Openscapes/workshop-planning` with a start date in the period, plus other issues active in that repo                        |
   | Mentor Calls               | "we discussed & developed" summaries from the mentor calls Google Doc; other dated meeting notes are listed as "Other meetings"                                 |
 
-**Note:** This is handy for populating boilerplate and pulling in the issues and meetings, but will require significant rewording and curating.
+**Note:** This is handy for populating boilerplate and pulling in the JupyterHub cost graphs, issues, and meetings, but will require rewording and curating.
 In particular:
 
-- Get other events/items from the Flywheel reporting slide
+- Get other events/items from the Flywheel reporting slides, blog posts, workshop writeups, events and webinars etc.
 - Tag reporting items with the deliverable numbers.
 
 ## Requirements
