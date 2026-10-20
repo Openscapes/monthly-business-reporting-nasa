@@ -1,4 +1,4 @@
-# monthly-reporting
+# Monthly business reporting for NASA Openscapes
 
 Generates a draft of the NASA Openscapes monthly reporting slide and inserts it as slide 1 of a local copy of `NASA-Openscapes_PMR_Slides.pptx`.
 The slide copies the layout of the current first slide and is built with officer.
@@ -17,8 +17,8 @@ This will:
 3. Pull the content, build the slide, and write `output/NASA-Openscapes_PMR_Slides.pptx`.
 4. Render `report.html`, a review page with the chart, the raw items pulled from each source, and a thumbnail of the new slide.
 
-Upload the output deck to Drive yourself and copy the slide into the original.
-You have to upload the whole deck as a pptx, if you copy the slide from the local copy and paste it into the original deck, it will only be copied as a single image.
+Upload the output deck to Drive yourself and copy the slide into the original, then edit to finalize it for submission.
+You have to upload the whole deck as a pptx, if you copy the slide from the local copy and paste it into the original deck, it will only be copied as a single image and be un-editable.
 
 ## Settings
 
@@ -38,6 +38,8 @@ To authenticate with AWS and Grafana for hub usage reporting, the script expects
 - `"NASA_AWS_ACCESS_KEY_ID"`
 - `"NASA_AWS_SECRET_ACCESS_KEY"`
 - `"NASA_GRAFANA_TOKEN"`
+
+See the [jupycost readme](https://github.com/openscapes/jupycost#authentication) for instructions.
 
 ## Slide content
 
@@ -69,3 +71,7 @@ In particular:
 - `R/mentor-calls.R`: mentor calls doc export and parsing
 - `R/content.R`: turns the fetched data into slide paragraphs (inline Markdown: `**bold**`, `[text](url)`, `{{TODO}}`)
 - `R/slide.R`: finds the shapes on slide 1, copies them to a new slide, fills in the content, and moves it to position 1
+
+## AI usage
+
+This script has been created with help of AI, using Claude Code especially to help parse the pptx files.
