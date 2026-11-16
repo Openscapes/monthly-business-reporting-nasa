@@ -26,7 +26,6 @@ gdrive_email <- "andy@openscapes.org"
 deck_drive_id <- "1GIo__VRaCx4aG-04lwcD93UFHr1k3N4z"
 download_deck <- TRUE
 template <- "template/NASA-Openscapes_PMR_Slides.pptx"
-output <- "output/NASA-Openscapes_PMR_Slides.pptx"
 start <- ""
 end <- ""
 cluster <- "openscapeshub"
@@ -46,12 +45,16 @@ if (isTRUE(download_deck)) {
     overwrite = TRUE
   )
 }
-dir.create(dirname(output), showWarnings = FALSE)
 
 deck <- read_pptx(template)
-range <- previous_report_range(deck)
+range <- next_report_range(deck)
 start <- if (nzchar(start)) as.Date(start) else range$start
-end <- if (nzchar(end)) as.Date(end) else range$end
+end <- if (nzchar(end)) as.Date(end) else Sys.Date()
+
+output <- glue::glue(
+  "output/NASA-Openscapes_PMR_Slides_update-{as.character(end)}.pptx"
+)
+dir.create(dirname(output), showWarnings = FALSE)
 ```
 
 Report period: **`r format_range(start, end)`** (the previous slide ended `r format_day(range$prev_end, "%b %d %Y")`).
@@ -154,7 +157,7 @@ if (nzchar(Sys.which("qlmanage"))) {
 thumb <- file.path(thumb_dir, paste0(basename(output), ".png"))
 ```
 
-New slide inserted at position 1 of `r output`. Items in red on the slide are placeholders to fill in by hand.
+New slide written to `r output` as a single-slide deck. Items in red on the slide are placeholders to fill in by hand.
 
 ```{r thumbnail}
 #| results: asis

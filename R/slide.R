@@ -64,7 +64,7 @@ third_monday <- function(date) {
   first + days((8 - wday(first, week_start = 1)) %% 7) + weeks(2)
 }
 
-previous_report_range <- function(deck) {
+next_report_range <- function(deck) {
   shapes <- find_shapes(presented_slide(deck))
   txt <- shape_text(shapes$title)
   end_txt <- stringr::str_match(
@@ -326,6 +326,7 @@ build_report_deck <- function(
     credits_text
   )
   deck <- move_slide(deck, index = length(deck), to = 1)
+  deck <- remove_slide(deck, index = seq_len(length(deck))[-1])
   print(deck, target = out_path)
   invisible(out_path)
 }

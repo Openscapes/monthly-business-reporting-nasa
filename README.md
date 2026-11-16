@@ -1,6 +1,6 @@
 # Monthly business reporting for NASA Openscapes
 
-Generates a draft of the NASA Openscapes monthly reporting slide and inserts it as slide 1 of a local copy of `NASA-Openscapes_PMR_Slides.pptx`.
+Generates a draft of the NASA Openscapes monthly reporting slide from the current first slide of `NASA-Openscapes_PMR_Slides.pptx` and writes it as a single-slide deck.
 The slide copies the layout of the current first slide and is built with officer.
 
 ## Usage
@@ -14,11 +14,12 @@ This will:
 1. Authenticate googledrive and googlesheets4 (as `gdrive_email`) and download the current deck to `template/`.
 2. Read the date range from slide 1's title.
    The new report period starts the day after that range ends and ends on the third Monday of the following month (`third_monday(start + months(1))`).
-3. Pull the content, build the slide, and write `output/NASA-Openscapes_PMR_Slides.pptx`.
+3. Pull the content, build the slide, and write `output/NASA-Openscapes_PMR_Slides_update-<end>.pptx`, containing only the new slide.
 4. Render `report.html`, a review page with the chart, the raw items pulled from each source, and a thumbnail of the new slide.
 
-Upload the output deck to Drive yourself and copy the slide into the original, then edit to finalize it for submission.
-You have to upload the whole deck as a pptx, if you copy the slide from the local copy and paste it into the original deck, it will only be copied as a single image and be un-editable.
+Upload the output deck to Drive yourself and copy the new slide into the original, and edit to finalize it for submission.
+Then delete the deck you uploaded.
+You have to upload the new deck as a pptx; if you copy the slide from the local copy and paste it into the original deck, it will only be copied as a single image and be un-editable.
 
 ## Settings
 
@@ -70,7 +71,7 @@ In particular:
 - `R/github.R`: engineering issues, workshop events, planning activity
 - `R/mentor-calls.R`: mentor calls doc export and parsing
 - `R/content.R`: turns the fetched data into slide paragraphs (inline Markdown: `**bold**`, `[text](url)`, `{{TODO}}`)
-- `R/slide.R`: finds the shapes on slide 1, copies them to a new slide, fills in the content, and moves it to position 1
+- `R/slide.R`: finds the shapes on slide 1, copies them to a new slide, fills in the content, and drops all the other slides
 
 ## AI usage
 

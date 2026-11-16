@@ -7,12 +7,22 @@ component_labels <- c(
   "other" = "other"
 )
 
+component_colors <- c(
+  "compute" = "#6889e9",
+  "core" = "#c33d69",
+  "home storage" = "#2ea597",
+  "networking" = "#8356cd",
+  "object storage" = "#e07a41",
+  "other" = "#0166ab"
+)
+
 palette_names <- c(
   "#6889e9" = "Blue",
   "#c33d69" = "Red",
   "#2ea597" = "Green",
   "#8356cd" = "Purple",
-  "#e07a41" = "Orange"
+  "#e07a41" = "Orange",
+  "#0166ab" = "Dark blue"
 )
 
 get_report_costs <- function(
@@ -93,9 +103,7 @@ plot_report_costs <- function(
     aes(date, cost, fill = service_component)
   ) +
     geom_col() +
-    scale_fill_discrete(
-      type = aws_ce_palette(nlevels(by_component$service_component))
-    ) +
+    scale_fill_manual(values = component_colors, na.value = "grey60") +
     scale_x_date(
       breaks = c(start, start + as.numeric(end - start) %/% 2, end),
       limits = c(start - 0.5, end + 0.5),
@@ -116,7 +124,7 @@ plot_report_costs <- function(
 
 color_key <- function(by_component, n = 3) {
   lvls <- levels(by_component$service_component)
-  cols <- set_names(aws_ce_palette(length(lvls)), lvls)
+  cols <- component_colors[lvls]
   top <- rev(lvls)[seq_len(min(n, length(lvls)))]
   tibble::tibble(
     component = top,
